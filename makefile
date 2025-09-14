@@ -1,7 +1,9 @@
+MAIN := src/main.cpp
+
 all: out/main run
 
-out/main: main.cpp | out
-	@clang++ -Wall -o out/main main.cpp
+out/main: $(MAIN) | out
+	@clang++ -Wall -o out/main $(MAIN)
 
 run: out/main | out
 	@out/main > out/image.ppm
