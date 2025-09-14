@@ -1,10 +1,10 @@
-all: out/main.exe run
+all: out/main run
 
-out/main.exe: main.cpp | out
-	@clang++ -Wall -o out/main.exe main.cpp
+out/main: main.cpp | out
+	@clang++ -Wall -o out/main main.cpp
 
-run: out/main.exe | out
-	@out\main.exe > out\image.ppm
+run: out/main | out
+	@out/main > out/image.ppm
 
 out:
-	@mkdir out
+	@mkdir -p out
