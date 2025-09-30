@@ -18,9 +18,30 @@ double hit_sphere(const Point3& center, double radius, const Ray& r) {
 }
 
 Color ray_color(const Ray &r) {
+  // Grande em cima.
+  double sphere3 = hit_sphere(Point3(1, 0.6, -1), 0.5, r);
+  if (sphere3 > 0.0) {
+    Vec3 normal = unit_vector(r.at(sphere3) - Vec3(1, 0.6, -1));
+    return 0.5 * Color(normal.x() + 1, normal.y() + 1, normal.z() + 1);
+  }
+
+  // Grande um pouco à direita.
+  double sphere1 = hit_sphere(Point3(0.3, 0, -1.3), 0.5, r);
+  if (sphere1 > 0.0) {
+    Vec3 normal = unit_vector(r.at(sphere1) - Vec3(0.3, 0, -1.3));
+    return 0.5 * Color(normal.x() + 1, normal.y() + 1, normal.z() + 1);
+  }
+
   double t = hit_sphere(Point3(0, 0, -1), 0.5, r);
   if (t > 0.0) {
     Vec3 normal = unit_vector(r.at(t) - Vec3(0, 0, -1));
+    return 0.5 * Color(normal.x() + 1, normal.y() + 1, normal.z() + 1);
+  }
+
+  // Pequena um pouco à esquerda.
+  double sphere2 = hit_sphere(Point3(0, 0, -0.3), 0.2, r);
+  if (sphere2 > 0.0) {
+    Vec3 normal = unit_vector(r.at(sphere2) - Vec3(0, 0, -0.3));
     return 0.5 * Color(normal.x() + 1, normal.y() + 1, normal.z() + 1);
   }
 
@@ -36,32 +57,42 @@ Color ray_color(const Ray &r) {
 }
 
 int main() {
-  // Image //
+  // Camera //
 
   auto aspect_ratio = 16.0 / 9.0;
   int image_width = 400;
-
   int image_height = int(image_width / aspect_ratio);
   image_height = (image_height < 1) ? 1 : image_height;
-
-  // Camera //
 
   auto focal_length = 1.0;
   auto viewport_height = 2.0;
   auto viewport_width = viewport_height * (double(image_width) / image_height);
-  auto camera_center = Point3(0, 0, 0);
 
-  auto viewport_u = Vec3(viewport_width, 0, 0);
-  auto viewport_v = Vec3(0, -viewport_height, 0);
+  // nova posição da câmera: deslocada no eixo X
+  auto camera_center = Point3(2, 0, -1);
+
+  // ponto para onde a câmera olha
+  auto lookat = Point3(0, 0, -1);
+  auto vup = Vec3(0, 1, 0);
+
+  // base da câmera
+  Vec3 w = unit_vector(camera_center - lookat);
+  Vec3 u = unit_vector(cross(vup, w));
+  Vec3 v = cross(w, u);
+
+  // vetores da viewport
+  auto viewport_u = viewport_width * u;
+  auto viewport_v = viewport_height * -v;
 
   auto pixel_delta_u = viewport_u / image_width;
   auto pixel_delta_v = viewport_v / image_height;
 
-  auto viewport_upper_left = camera_center - Vec3(0, 0, focal_length) -
-                             viewport_u / 2 - viewport_v / 2;
-	auto pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
+  auto viewport_upper_left =
+      camera_center - w - viewport_u / 2 - viewport_v / 2;
+  auto pixel00_loc =
+      viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 
-	// Render //
+  // Render //
 
   std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
