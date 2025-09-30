@@ -68,29 +68,23 @@ int main() {
   auto viewport_height = 2.0;
   auto viewport_width = viewport_height * (double(image_width) / image_height);
 
-  // nova posição da câmera: deslocada no eixo X
   auto camera_center = Point3(2, 0, -1);
 
-  // ponto para onde a câmera olha
   auto lookat = Point3(0, 0, -1);
   auto vup = Vec3(0, 1, 0);
 
-  // base da câmera
   Vec3 w = unit_vector(camera_center - lookat);
   Vec3 u = unit_vector(cross(vup, w));
   Vec3 v = cross(w, u);
 
-  // vetores da viewport
   auto viewport_u = viewport_width * u;
   auto viewport_v = viewport_height * -v;
 
   auto pixel_delta_u = viewport_u / image_width;
   auto pixel_delta_v = viewport_v / image_height;
 
-  auto viewport_upper_left =
-      camera_center - w - viewport_u / 2 - viewport_v / 2;
-  auto pixel00_loc =
-      viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
+  auto viewport_upper_left = camera_center - w - viewport_u / 2 - viewport_v / 2;
+  auto pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 
   // Render //
 
