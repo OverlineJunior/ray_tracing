@@ -24,6 +24,12 @@ Color ray_color(const Ray &r) {
     return 0.5 * Color(normal.x() + 1, normal.y() + 1, normal.z() + 1);
   }
 
+  double ground = hit_sphere(Point3(0, -100.5, -1), 100, r);
+  if (ground > 0.0) {
+    Vec3 normal = unit_vector(r.at(ground) - Vec3(0, -100.5, -1));
+    return 0.5 * Color(normal.x() + 1, normal.y() + 1, normal.z() + 1);
+  }
+
 	Vec3 unit_dir = unit_vector(r.direction());
 	auto a = 0.5 * (unit_dir.y() + 1.0);
 	return (1.0 - a) * Color(1.0, 1.0, 1.0) + a * Color(0.5, 0.7, 1.0);
