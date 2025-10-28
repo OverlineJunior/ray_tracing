@@ -8,6 +8,12 @@ class HitRecord {
 		Point3 hit_pos;
 		Vec3 normal;
 		double dist;
+		bool is_front_face;
+
+		void set_face_normal(const Ray& r, const Vec3& outward_normal) {
+			is_front_face = dot(r.direction(), outward_normal) < 0;
+			normal = is_front_face ? outward_normal : -outward_normal;
+		}
 };
 
 class Hittable {
