@@ -2,6 +2,7 @@
 #define HITTABLE_LIST_H
 
 #include "hittable.h"
+#include "interval.h"
 #include <vector>
 #include <memory>
 
@@ -26,13 +27,13 @@ class HittableList : public Hittable {
 		}
 
 		/// `HitRecord` is updated with the closest hit information.
-		bool hit(const Ray& r, double min_dist, double max_dist, HitRecord& rec) const override {
+		bool hit(const Ray& r, Interval dist, HitRecord& rec) const override {
 			HitRecord temp_rec;
 			bool hit_any = false;
-			auto closest_dist = max_dist;
+			auto closest_dist = dist.max;
 
 			for (const auto& obj : objects) {
-				if (obj->hit(r, min_dist, closest_dist, temp_rec)) {
+				if (obj->hit(r, Interval(dist.min, closest_dist), temp_rec)) {
 					hit_any = true;
 					closest_dist = temp_rec.dist;
 					rec = temp_rec;

@@ -2,13 +2,14 @@
 #define SPHERE_H
 
 #include "hittable.h"
+#include "interval.h"
 #include "vec3.h"
 
 class Sphere : public Hittable {
 	public:
 		Sphere(const Point3& center, double radius) : center(center), radius(std::fmax(0, radius)) {}
 
-		bool hit(const Ray& r, double min_dist, double max_dist, HitRecord& rec) const override {
+		bool hit(const Ray& r, Interval dist, HitRecord& rec) const override {
 			Vec3 oc = center - r.origin();
 			auto a = r.direction().length_squared();
 			auto h = dot(r.direction(), oc);
@@ -23,9 +24,9 @@ class Sphere : public Hittable {
 
 			// Find the nearest root that lies in the acceptable range.
 			auto root = (h - sqrt_d) / a;
-			if (root <= min_dist || root >= max_dist) {
+			if (!dist.surrounds(root)) {
 				root = (h + sqrt_d) / a;
-				if (root <= min_dist || root >= max_dist) {
+				if (!dist.surrounds(root)) {
 					return false;
 				}
 			}

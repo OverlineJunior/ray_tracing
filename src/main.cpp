@@ -3,11 +3,12 @@
 #include "sphere.h"
 #include "color.h"
 #include "util.h"
+#include "interval.h"
 #include <iostream>
 
 Color ray_color(const Ray &r, const Hittable& world) {
   HitRecord rec;
-  if (world.hit(r, 0, INF, rec)) {
+  if (world.hit(r, Interval(0, INF), rec)) {
     return 0.5 * (rec.normal + Color(1, 1, 1));
   }
 

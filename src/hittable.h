@@ -2,6 +2,7 @@
 #define HITTABLE_H
 
 #include "ray.h"
+#include "interval.h"
 
 class HitRecord {
 	public:
@@ -20,7 +21,7 @@ class Hittable {
 	public:
 		virtual ~Hittable() = default;
 
-		virtual bool hit(const Ray& r, double min_dist, double max_dist, HitRecord& rec) const = 0;
+		virtual bool hit(const Ray& r, Interval dist, HitRecord& rec) const = 0;
 };
 
 #endif
