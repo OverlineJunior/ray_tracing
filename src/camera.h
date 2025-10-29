@@ -9,6 +9,7 @@ class Camera {
 	public:
 		double aspect_ratio = 1.0;
 		int image_width = 100;
+		int samples_per_pixel = 10;
 
 		void render(const Hittable& world) {
 			initialize();
@@ -17,20 +18,20 @@ class Camera {
 
 			for (int j = 0; j < image_height; j++) {
 				for (int i = 0; i < image_width; i++) {
-					auto pixel_center = pixel00_loc +
-										(i * pixel_delta_u) +
-										(j * pixel_delta_v);
-					auto ray_dir = pixel_center - center;
-					auto r = Ray(center, ray_dir);
+					Color pixel_color(0, 0, 0);
+					for (int s = 0; s < samples_per_pixel; s++) {
+						Ray r = get_ray(i, j);
+						pixel_color += ray_color(r, world);
+					}
 
-					Color pixel_color = ray_color(r, world);
-					write_color(std::cout, pixel_color);
+					write_color(std::cout, pixel_samples_scale * pixel_color);
 				}
 			}
         }
 
 	private:
 		int image_height;
+		double pixel_samples_scale;
 		Point3 center;
 		Point3 pixel00_loc;
 		Vec3 pixel_delta_u;
@@ -39,6 +40,8 @@ class Camera {
 		void initialize() {
 			image_height = int(image_width / aspect_ratio);
 			image_height = image_height < 1 ? 1 : image_height;
+
+			pixel_samples_scale = 1.0 / samples_per_pixel;
 
 			center = Point3(0, 0, 0);
 
@@ -55,6 +58,22 @@ class Camera {
 			auto viewport_upper_left = center - Vec3(0, 0, focal_length) -
 									 viewport_u / 2 - viewport_v / 2;
 			pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
+		}
+
+		Ray get_ray(int i, int j) const {
+			auto offset = sample_square();
+			auto pixel_sample = pixel00_loc
+				+ (i + offset.x()) * pixel_delta_u
+				+ (j + offset.y()) * pixel_delta_v;
+
+			auto ray_ori = center;
+			auto ray_dir = pixel_sample - center;
+
+			return Ray(ray_ori, ray_dir);
+		}
+
+		Vec3 sample_square() const {
+			return Vec3(random_double() - 0.5, random_double() - 0.5, 0);
 		}
 
 		Color ray_color(const Ray &r, const Hittable& world) const {
