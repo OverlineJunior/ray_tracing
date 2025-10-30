@@ -4,6 +4,7 @@
 #include "color.h"
 #include "hittable.h"
 #include "ray.h"
+#include "vec3.h"
 
 class Camera {
 	public:
@@ -79,7 +80,8 @@ class Camera {
 		Color ray_color(const Ray &r, const Hittable& world) const {
 			HitRecord rec;
 			if (world.hit(r, Interval(0, INF), rec)) {
-				return 0.5 * (rec.normal + Color(1, 1, 1));
+				Vec3 dir = random_on_hemisphere(rec.normal);
+				return 0.5 * ray_color(Ray(rec.hit_pos, dir), world);
 			}
 
 			Vec3 unit_dir = unit_vector(r.direction());
